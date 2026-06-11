@@ -115,6 +115,14 @@
         <option value="{{ p.id }}">{{ p.name }}</option>
         {% endfor %}
       </select>
+
+      <label for="language" style="margin-top: 16px;">Summary Language</label>
+      <select name="language" id="language">
+        {% for code, name in languages.items() %}
+        <option value="{{ code }}">{{ name }}</option>
+        {% endfor %}
+      </select>
+
       <button type="submit" id="btn">Generate DIPS Summary</button>
     </form>
 

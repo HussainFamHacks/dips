@@ -7,7 +7,7 @@ def image_to_base64(image_path):
     with open(image_path, "rb") as f:
         return base64.b64encode(f.read()).decode("utf-8")
 
-def build_report(ips_data, images, output_path="output/summary.html"):
+def build_report(ips_data, images, output_path="output/summary.html", lang="en", lang_name="English"):
     env = Environment(loader=FileSystemLoader("templates"))
     template = env.get_template("report.html")
 
@@ -28,7 +28,7 @@ def build_report(ips_data, images, output_path="output/summary.html"):
                 "error": img.get("error", "Image unavailable")
             })
 
-    html = template.render(ips=ips_data, images=embedded_images)
+    html = template.render(ips=ips_data, images=embedded_images, lang=lang, lang_name=lang_name)
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
