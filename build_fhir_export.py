@@ -2,7 +2,9 @@ import base64
 import json
 import uuid
 import os
+import tempfile
 from datetime import datetime, timezone
+from fetch_images import fetch_series, fetch_instances, download_raw_dicom
 
 
 def make_id():
@@ -74,13 +76,13 @@ def build_fhir_bundle(ips_data, images, output_path=None):
         entries.append(_entry("ImagingStudy", study["id"], res))
         imaging_refs.append({"reference": f"ImagingStudy/{study['id']}"})
 
-    # ── 6. Binary + DocumentReference for each image ─────────────────────────
+    # ── 6. Binary + DocumentReference for rendered JPEG images ───────────────
     docref_refs = []
     for img in images:
         if not img.get("path") or not os.path.exists(img["path"]):
             continue
 
-        # Binary resource — holds the raw image data
+        # Binary resource — holds the rendered JPEG
         binary_id = make_id()
         binary_resource = {
             "resourceType": "Binary",
@@ -115,9 +117,78 @@ def build_fhir_bundle(ips_data, images, output_path=None):
             }]
         }
         entries.append(_entry("DocumentReference", docref_id, docref_resource))
-        docref_refs.append({"reference": f"DocumentReference/{docref_id}"})
+        docref_refs.append({"reference": f"DocumentReference/{docref_id})"})
 
-    # ── 7. Composition (IPS document header — ties everything together) ───────
+    # ── 7. Raw DICOM — fetch one instance and embed as application/dicom ─────
+    raw_dicom_refs = []
+    for study in ips_data["imaging"]:
+        study_uid = next(
+            (i["value"] for i in study.get("identifier", []) if i.get("system") == "urn:dicom:uid"),
+            None
+        )
+        if not study_uid:
+            continue
+        try:
+            series_list = fetch_series(study_uid)
+            if not series_list:
+                continue
+            # Just grab the first series, first instance
+            series_uid = series_list[0]["0020000E"]["Value"][0]
+            instances = fetch_instances(study_uid, series_uid)
+            if not instances:
+                continue
+            instance_uid = instances[0]["00080018"]["Value"][0]
+            modality = series_list[0].get("00080060", {}).get("Value", ["UNKNOWN"])[0]
+
+            # Download raw DICOM to a temp file
+            with tempfile.NamedTemporaryFile(suffix=".dcm", delete=False) as tmp:
+                tmp_path = tmp.name
+            download_raw_dicom(study_uid, series_uid, instance_uid, tmp_path)
+
+            # Encode and embed
+            with open(tmp_path, "rb") as f:
+                dicom_b64 = base64.b64encode(f.read()).decode("utf-8")
+            os.unlink(tmp_path)
+
+            # Binary resource — raw DICOM
+            dicom_binary_id = make_id()
+            entries.append(_entry("Binary", dicom_binary_id, {
+                "resourceType": "Binary",
+                "id": dicom_binary_id,
+                "contentType": "application/dicom",
+                "data": dicom_b64
+            }))
+
+            # DocumentReference pointing to the raw DICOM Binary
+            dicom_docref_id = make_id()
+            entries.append(_entry("DocumentReference", dicom_docref_id, {
+                "resourceType": "DocumentReference",
+                "id": dicom_docref_id,
+                "status": "current",
+                "type": {
+                    "coding": [{
+                        "system": "http://loinc.org",
+                        "code": "18748-4",
+                        "display": "Diagnostic imaging study"
+                    }]
+                },
+                "subject": {"reference": patient_ref},
+                "date": now,
+                "description": f"Raw DICOM — {modality} — {study.get('started', 'N/A')}",
+                "content": [{
+                    "attachment": {
+                        "contentType": "application/dicom",
+                        "url": f"Binary/{dicom_binary_id}",
+                        "title": f"DICOM Instance — {modality}"
+                    }
+                }]
+            }))
+            raw_dicom_refs.append({"reference": f"DocumentReference/{dicom_docref_id}"})
+
+        except Exception as e:
+            print(f"Could not fetch raw DICOM: {e}")
+
+    # ── 8. Composition (IPS document header — ties everything together) ───────
     composition = {
         "resourceType": "Composition",
         "id": composition_id,
@@ -139,12 +210,13 @@ def build_fhir_bundle(ips_data, images, output_path=None):
             _section("Medications", "10160-0", med_refs),
             _section("Imaging Studies", "18748-4", imaging_refs),
             _section("DICOM Images", "18748-4", docref_refs),
+            _section("Raw DICOM", "18748-4", raw_dicom_refs),
         ]
     }
     # Composition goes first in the bundle
     entries.insert(0, _entry("Composition", composition_id, composition))
 
-    # ── 8. Assemble Bundle ────────────────────────────────────────────────────
+    # ── 9. Assemble Bundle ────────────────────────────────────────────────────
     bundle = {
         "resourceType": "Bundle",
         "id": bundle_id,

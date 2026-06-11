@@ -32,6 +32,16 @@ def download_image(study_uid, series_uid, instance_uid, output_path):
     with open(output_path, "wb") as f:
         f.write(response.content)
 
+def download_raw_dicom(study_uid, series_uid, instance_uid, output_path):
+    """Download a single raw DICOM instance (application/dicom)"""
+    url = f"{DICOMWEB_URL}/studies/{study_uid}/series/{series_uid}/instances/{instance_uid}"
+    headers = {**HEADERS, "Accept": "application/dicom"}
+    response = requests.get(url, headers=headers, verify=False, timeout=15)
+    response.raise_for_status()
+    with open(output_path, "wb") as f:
+        f.write(response.content)
+    return output_path
+
 def download_patient_images(patient_id, imaging_studies, output_dir="output/images"):
     os.makedirs(output_dir, exist_ok=True)
     all_images = []
