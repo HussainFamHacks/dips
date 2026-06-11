@@ -8,75 +8,159 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1a202c; }
 
+    /* ── Header ── */
     .header {
       background: linear-gradient(135deg, #0a3d62, #0e9f6e);
       color: white;
-      padding: 30px 40px;
+      padding: 20px 24px;
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 16px;
+      flex-wrap: wrap;
     }
-    .header-icon { font-size: 48px; }
-    .header h1 { font-size: 28px; font-weight: 700; }
-    .header p { font-size: 14px; opacity: 0.85; margin-top: 4px; }
+    .header svg { width: 48px; height: 48px; flex-shrink: 0; }
+    .header-text { flex: 1; min-width: 0; }
+    .header-text h1 { font-size: 24px; font-weight: 700; letter-spacing: 3px; }
+    .header-text p { font-size: 13px; opacity: 0.85; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .badge {
-      margin-left: auto;
       background: rgba(255,255,255,0.2);
       border: 1px solid rgba(255,255,255,0.4);
       border-radius: 20px;
-      padding: 6px 16px;
-      font-size: 12px;
+      padding: 5px 14px;
+      font-size: 11px;
       font-weight: 600;
       letter-spacing: 1px;
+      white-space: nowrap;
     }
 
-    .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+    /* ── Layout ── */
+    .container { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
 
+    /* ── Patient Card ── */
     .patient-card {
       background: white;
       border-radius: 12px;
-      padding: 24px 30px;
-      margin-bottom: 24px;
+      padding: 20px;
+      margin-bottom: 20px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 16px;
     }
-    .patient-field label { font-size: 11px; text-transform: uppercase; color: #718096; letter-spacing: 0.5px; }
-    .patient-field p { font-size: 16px; font-weight: 600; margin-top: 4px; }
+    .patient-field label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #718096;
+      letter-spacing: 0.5px;
+      display: block;
+    }
+    .patient-field p {
+      font-size: 15px;
+      font-weight: 600;
+      margin-top: 3px;
+      word-break: break-word;
+    }
 
-    .section { background: white; border-radius: 12px; padding: 24px 30px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    .section h2 { font-size: 17px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: #2d3748; }
-    .section h2 .icon { font-size: 20px; }
+    /* ── Sections ── */
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .section h2 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #2d3748;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
     .empty { color: #a0aec0; font-style: italic; font-size: 14px; }
 
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th { text-align: left; padding: 10px 12px; background: #f7fafc; color: #4a5568; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; }
-    td { padding: 10px 12px; border-bottom: 1px solid #edf2f7; }
+    /* ── Tables — scrollable on mobile ── */
+    .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 400px; }
+    th {
+      text-align: left;
+      padding: 10px 12px;
+      background: #f7fafc;
+      color: #4a5568;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #e2e8f0;
+      white-space: nowrap;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #edf2f7;
+      word-break: break-word;
+    }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #f7fafc; }
 
-    .severity-severe { color: #e53e3e; font-weight: 600; }
+    .severity-severe   { color: #e53e3e; font-weight: 600; }
     .severity-moderate { color: #dd6b20; font-weight: 600; }
-    .severity-mild { color: #38a169; font-weight: 600; }
+    .severity-mild     { color: #38a169; font-weight: 600; }
 
-    .imaging-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    /* Status / intent badges */
+    .pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: capitalize;
+      background: #edf2f7;
+      color: #4a5568;
+    }
+    .pill-active   { background: #c6f6d5; color: #276749; }
+    .pill-final    { background: #bee3f8; color: #2a69ac; }
+    .pill-inactive { background: #fed7d7; color: #9b2c2c; }
+
+    /* ── Imaging Grid ── */
+    .imaging-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
     .imaging-card { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
-    .imaging-card img { width: 100%; height: 220px; object-fit: cover; background: #1a202c; }
-    .imaging-placeholder { width: 100%; height: 220px; background: #1a202c; display: flex; align-items: center; justify-content: center; color: #718096; font-size: 13px; }
+    .imaging-card img { width: 100%; height: 200px; object-fit: cover; background: #1a202c; display: block; }
+    .imaging-placeholder {
+      width: 100%; height: 200px;
+      background: #1a202c;
+      display: flex; align-items: center; justify-content: center;
+      color: #718096; font-size: 13px;
+    }
     .imaging-info { padding: 12px; }
-    .imaging-info .modality { font-weight: 700; font-size: 15px; color: #1a56db; }
+    .imaging-info .modality { font-weight: 700; font-size: 15px; color: #0a3d62; text-transform: uppercase; }
     .imaging-info .date { font-size: 12px; color: #718096; margin-top: 2px; }
     .imaging-info .error { font-size: 12px; color: #e53e3e; margin-top: 4px; }
 
-    .footer { text-align: center; padding: 20px; color: #a0aec0; font-size: 12px; }
+    /* ── Footer ── */
+    .footer { text-align: center; padding: 20px 16px; color: #a0aec0; font-size: 12px; }
+
+    /* ── Mobile overrides ── */
+    @media (max-width: 600px) {
+      .header-text h1 { font-size: 20px; }
+      .badge { display: none; }
+      .patient-card { grid-template-columns: 1fr 1fr; }
+      .imaging-grid { grid-template-columns: 1fr; }
+      .section h2 { font-size: 14px; }
+    }
   </style>
 </head>
 <body>
 
 <div class="header">
-  <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:56px;height:56px;flex-shrink:0;">
+  <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
     <circle cx="40" cy="40" r="38" fill="rgba(255,255,255,0.15)"/>
     <rect x="33" y="16" width="14" height="48" rx="4" fill="white" opacity="0.95"/>
     <rect x="16" y="33" width="48" height="14" rx="4" fill="white" opacity="0.95"/>
@@ -88,8 +172,8 @@
     <path d="M16 56 L16 64 L24 64" stroke="#0e9f6e" stroke-width="3" fill="none" stroke-linecap="round"/>
     <path d="M64 56 L64 64 L56 64" stroke="#0e9f6e" stroke-width="3" fill="none" stroke-linecap="round"/>
   </svg>
-  <div>
-    <h1 style="font-size:26px;letter-spacing:3px;">DIPS</h1>
+  <div class="header-text">
+    <h1>DIPS</h1>
     <p>DICOM International Patient Summary &nbsp;•&nbsp; {{ ips.patient.name }}</p>
   </div>
   <div class="badge">FHIR R5 • DICOMweb</div>
@@ -101,7 +185,7 @@
   <div class="patient-card">
     <div class="patient-field">
       <label>Full Name</label>
-      <p>{{ ips.patient.name }}</p>
+      <p>{{ ips.patient.name | title }}</p>
     </div>
     <div class="patient-field">
       <label>Date of Birth</label>
@@ -109,11 +193,11 @@
     </div>
     <div class="patient-field">
       <label>Gender</label>
-      <p>{{ ips.patient.gender }}</p>
+      <p>{{ ips.patient.gender | capitalize }}</p>
     </div>
     <div class="patient-field">
       <label>Address</label>
-      <p>{{ ips.patient.address }}</p>
+      <p>{{ ips.patient.address | title }}</p>
     </div>
     <div class="patient-field">
       <label>Patient ID</label>
@@ -123,22 +207,24 @@
 
   <!-- Conditions -->
   <div class="section">
-    <h2><span class="icon">🩺</span> Conditions</h2>
+    <h2><span>🩺</span> Conditions</h2>
     {% if ips.conditions %}
+    <div class="table-wrap">
     <table>
       <tr><th>Condition</th><th>Severity</th><th>Body Site</th><th>Onset</th><th>Status</th></tr>
       {% for c in ips.conditions %}
+      {% set severity = c.get('severity', {}).get('coding', [{}])[0].get('display', 'N/A') %}
+      {% set status   = c.get('clinicalStatus', {}).get('coding', [{}])[0].get('code', 'N/A') %}
       <tr>
-        <td>{{ c.get('code', {}).get('text', 'Unknown') }}</td>
-        <td class="severity-{{ c.get('severity', {}).get('coding', [{}])[0].get('display', '').lower() }}">
-          {{ c.get('severity', {}).get('coding', [{}])[0].get('display', 'N/A') }}
-        </td>
-        <td>{{ c.get('bodySite', [{}])[0].get('text', 'N/A') }}</td>
+        <td>{{ c.get('code', {}).get('text', 'Unknown') | title }}</td>
+        <td class="severity-{{ severity | lower }}">{{ severity }}</td>
+        <td>{{ c.get('bodySite', [{}])[0].get('text', 'N/A') | title }}</td>
         <td>{{ c.get('onsetDateTime', 'N/A') }}</td>
-        <td>{{ c.get('clinicalStatus', {}).get('coding', [{}])[0].get('code', 'N/A') }}</td>
+        <td><span class="pill pill-{{ status }}">{{ status | capitalize }}</span></td>
       </tr>
       {% endfor %}
     </table>
+    </div>
     {% else %}
     <p class="empty">No conditions recorded</p>
     {% endif %}
@@ -146,19 +232,22 @@
 
   <!-- Allergies -->
   <div class="section">
-    <h2><span class="icon">⚠️</span> Allergies</h2>
+    <h2><span>⚠️</span> Allergies</h2>
     {% if ips.allergies %}
+    <div class="table-wrap">
     <table>
       <tr><th>Substance</th><th>Reaction</th><th>Severity</th><th>Status</th></tr>
       {% for a in ips.allergies %}
+      {% set status = a.get('clinicalStatus', {}).get('coding', [{}])[0].get('code', 'N/A') %}
       <tr>
-        <td>{{ a.get('code', {}).get('text', 'Unknown') }}</td>
-        <td>{{ a.get('reaction', [{}])[0].get('manifestation', [{}])[0].get('concept', {}).get('text', 'N/A') }}</td>
-        <td>{{ a.get('reaction', [{}])[0].get('severity', 'N/A') }}</td>
-        <td>{{ a.get('clinicalStatus', {}).get('coding', [{}])[0].get('code', 'N/A') }}</td>
+        <td>{{ a.get('code', {}).get('text', 'Unknown') | title }}</td>
+        <td>{{ a.get('reaction', [{}])[0].get('manifestation', [{}])[0].get('concept', {}).get('text', 'N/A') | title }}</td>
+        <td>{{ a.get('reaction', [{}])[0].get('severity', 'N/A') | capitalize }}</td>
+        <td><span class="pill pill-{{ status }}">{{ status | capitalize }}</span></td>
       </tr>
       {% endfor %}
     </table>
+    </div>
     {% else %}
     <p class="empty">No allergies recorded</p>
     {% endif %}
@@ -166,18 +255,22 @@
 
   <!-- Medications -->
   <div class="section">
-    <h2><span class="icon">💊</span> Medications</h2>
+    <h2><span>💊</span> Medications</h2>
     {% if ips.medications %}
+    <div class="table-wrap">
     <table>
       <tr><th>Medication</th><th>Status</th><th>Intent</th></tr>
       {% for m in ips.medications %}
+      {% set status = m.get('status', 'N/A') %}
+      {% set intent = m.get('intent', 'N/A') %}
       <tr>
-        <td>{{ m.get('medicationCodeableConcept', {}).get('text', 'Unknown') }}</td>
-        <td>{{ m.get('status', 'N/A') }}</td>
-        <td>{{ m.get('intent', 'N/A') }}</td>
+        <td>{{ m.get('medicationCodeableConcept', {}).get('text', 'Unknown') | title }}</td>
+        <td><span class="pill pill-{{ status }}">{{ status | capitalize }}</span></td>
+        <td>{{ intent | capitalize }}</td>
       </tr>
       {% endfor %}
     </table>
+    </div>
     {% else %}
     <p class="empty">No medications recorded</p>
     {% endif %}
@@ -185,19 +278,22 @@
 
   <!-- Diagnostic Reports -->
   <div class="section">
-    <h2><span class="icon">📋</span> Diagnostic Reports</h2>
+    <h2><span>📋</span> Diagnostic Reports</h2>
     {% if ips.reports %}
+    <div class="table-wrap">
     <table>
       <tr><th>Report</th><th>Date</th><th>Status</th><th>Conclusion</th></tr>
       {% for r in ips.reports %}
+      {% set status = r.get('status', 'N/A') %}
       <tr>
-        <td>{{ r.get('code', {}).get('text', 'Unknown') }}</td>
+        <td>{{ r.get('code', {}).get('text', 'Unknown') | title }}</td>
         <td>{{ r.get('effectiveDateTime', 'N/A') }}</td>
-        <td>{{ r.get('status', 'N/A') }}</td>
+        <td><span class="pill pill-{{ status }}">{{ status | capitalize }}</span></td>
         <td>{{ r.get('conclusion', 'N/A') }}</td>
       </tr>
       {% endfor %}
     </table>
+    </div>
     {% else %}
     <p class="empty">No diagnostic reports recorded</p>
     {% endif %}
@@ -205,7 +301,7 @@
 
   <!-- Medical Imaging -->
   <div class="section">
-    <h2><span class="icon">🔬</span> Medical Imaging</h2>
+    <h2><span>🔬</span> Medical Imaging</h2>
     {% if images %}
     <div class="imaging-grid">
       {% for img in images %}
