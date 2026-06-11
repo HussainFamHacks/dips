@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DIPS — DICOM International Patient Summary</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(160deg, #0f1f3d 0%, #0a3d62 50%, #0e6655 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      padding: 48px;
+      width: 100%;
+      max-width: 460px;
+      text-align: center;
+    }
+
+    .logo-wrap { margin-bottom: 20px; }
+    .logo-wrap svg { width: 80px; height: 80px; }
+
+    .brand { font-size: 36px; font-weight: 800; letter-spacing: 4px; color: #0a3d62; }
+    .brand span { color: #0e9f6e; }
+    .tagline { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #a0aec0; margin-top: 4px; }
+    .subtitle { color: #718096; font-size: 14px; margin-top: 16px; margin-bottom: 32px; }
+
+    .divider { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
+
+    label { display: block; text-align: left; font-size: 12px; font-weight: 700; color: #4a5568; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    select {
+      width: 100%;
+      padding: 13px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 15px;
+      color: #2d3748;
+      background: white;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23718096' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    select:focus { outline: none; border-color: #0a3d62; }
+
+    button {
+      width: 100%;
+      margin-top: 16px;
+      padding: 14px;
+      background: linear-gradient(135deg, #0a3d62, #0e9f6e);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    button:hover { opacity: 0.92; transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .spinner { display: none; margin-top: 16px; color: #718096; font-size: 13px; }
+    .spinner.active { display: block; }
+
+    .footer { margin-top: 28px; font-size: 11px; color: #cbd5e0; }
+  </style>
+</head>
+<body>
+  <div class="card">
+
+    <!-- DIPS Logo -->
+    <div class="logo-wrap">
+      <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+        <!-- Outer circle -->
+        <circle cx="40" cy="40" r="38" fill="#0a3d62"/>
+        <!-- Cross shape (medical) -->
+        <rect x="33" y="16" width="14" height="48" rx="4" fill="white" opacity="0.95"/>
+        <rect x="16" y="33" width="48" height="14" rx="4" fill="white" opacity="0.95"/>
+        <!-- DICOM scan lines overlay -->
+        <rect x="16" y="33" width="48" height="2.5" rx="1" fill="#0e9f6e" opacity="0.7"/>
+        <rect x="16" y="38" width="48" height="2.5" rx="1" fill="#0e9f6e" opacity="0.5"/>
+        <rect x="16" y="43" width="48" height="2.5" rx="1" fill="#0e9f6e" opacity="0.3"/>
+        <!-- Corner scan brackets -->
+        <path d="M16 24 L16 16 L24 16" stroke="#0e9f6e" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M64 24 L64 16 L56 16" stroke="#0e9f6e" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M16 56 L16 64 L24 64" stroke="#0e9f6e" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M64 56 L64 64 L56 64" stroke="#0e9f6e" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="brand">D<span>I</span>PS</div>
+    <div class="tagline">DICOM International Patient Summary</div>
+    <p class="subtitle">Select a patient to generate their portable medical summary with full imaging history</p>
+
+    <hr class="divider"/>
+
+    <form id="form" action="/generate" method="POST">
+      <label for="patient">Select Patient</label>
+      <select name="patient_id" id="patient">
+        {% for p in patients %}
+        <option value="{{ p.id }}">{{ p.name }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" id="btn">Generate DIPS Summary</button>
+    </form>
+
+    <div class="spinner" id="spinner">⏳ Fetching patient data and imaging studies...</div>
+
+    <div class="footer">SIIM Hackathon 2026 &nbsp;•&nbsp; DIPS Prototype</div>
+  </div>
+
+  <script>
+    document.getElementById('form').addEventListener('submit', function() {
+      document.getElementById('btn').disabled = true;
+      document.getElementById('btn').textContent = 'Generating...';
+      document.getElementById('spinner').classList.add('active');
+    });
+  </script>
+</body>
+</html>

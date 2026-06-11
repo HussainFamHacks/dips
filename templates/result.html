@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DIPS — Summary Ready</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(160deg, #0f1f3d 0%, #0a3d62 50%, #0e6655 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      padding: 48px;
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+    }
+
+    .brand { font-size: 28px; font-weight: 800; letter-spacing: 4px; color: #0a3d62; margin-bottom: 4px; }
+    .brand span { color: #0e9f6e; }
+
+    .success { font-size: 48px; margin: 16px 0 8px; }
+    h1 { font-size: 22px; font-weight: 700; color: #1a202c; }
+    .subtitle { color: #718096; font-size: 14px; margin-top: 6px; margin-bottom: 24px; }
+
+    .qr-container { margin: 20px auto; }
+    .qr-container img {
+      width: 190px;
+      height: 190px;
+      border: 5px solid #0a3d62;
+      border-radius: 14px;
+      padding: 6px;
+    }
+    .qr-label { font-size: 12px; color: #a0aec0; margin-top: 8px; }
+
+    .divider { border: none; border-top: 1px solid #e2e8f0; margin: 20px 0; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      margin-top: 10px;
+      transition: opacity 0.2s, transform 0.1s;
+      cursor: pointer;
+    }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-primary { background: linear-gradient(135deg, #0a3d62, #0e9f6e); color: white; border: none; }
+    .btn-secondary { background: #f7fafc; color: #4a5568; border: 2px solid #e2e8f0; }
+
+    .back { margin-top: 20px; font-size: 13px; color: #a0aec0; }
+    .back a { color: #0a3d62; text-decoration: none; font-weight: 600; }
+    .back a:hover { text-decoration: underline; }
+
+    .footer { margin-top: 20px; font-size: 11px; color: #cbd5e0; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">D<span>I</span>PS</div>
+
+    <div class="success">✅</div>
+    <h1>Summary Ready</h1>
+    <p class="subtitle">DIPS report generated for <strong>{{ patient_name }}</strong></p>
+
+    <div class="qr-container">
+      <img src="{{ qr_url }}" alt="QR Code"/>
+      <div class="qr-label">Scan to open on any device</div>
+    </div>
+
+    <hr class="divider"/>
+
+    <a href="{{ report_url }}" class="btn btn-primary" target="_blank">📄 Open Full DIPS Report</a>
+    <a href="{{ fhir_url }}" class="btn btn-secondary">⬇️ Download FHIR Bundle (.json)</a>
+    <a href="{{ qr_url }}" class="btn btn-secondary" download>⬇️ Download QR Code</a>
+
+    <div class="back"><a href="/">← Generate another summary</a></div>
+    <div class="footer">SIIM Hackathon 2026 &nbsp;•&nbsp; DIPS Prototype</div>
+  </div>
+</body>
+</html>

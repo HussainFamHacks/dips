@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DIPS — {{ ips.patient.name }}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1a202c; }
+
+    .header {
+      background: linear-gradient(135deg, #0a3d62, #0e9f6e);
+      color: white;
+      padding: 30px 40px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .header-icon { font-size: 48px; }
+    .header h1 { font-size: 28px; font-weight: 700; }
+    .header p { font-size: 14px; opacity: 0.85; margin-top: 4px; }
+    .badge {
+      margin-left: auto;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+
+    .patient-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px 30px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    .patient-field label { font-size: 11px; text-transform: uppercase; color: #718096; letter-spacing: 0.5px; }
+    .patient-field p { font-size: 16px; font-weight: 600; margin-top: 4px; }
+
+    .section { background: white; border-radius: 12px; padding: 24px 30px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .section h2 { font-size: 17px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: #2d3748; }
+    .section h2 .icon { font-size: 20px; }
+
+    .empty { color: #a0aec0; font-style: italic; font-size: 14px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { text-align: left; padding: 10px 12px; background: #f7fafc; color: #4a5568; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; }
+    td { padding: 10px 12px; border-bottom: 1px solid #edf2f7; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f7fafc; }
+
+    .severity-severe { color: #e53e3e; font-weight: 600; }
+    .severity-moderate { color: #dd6b20; font-weight: 600; }
+    .severity-mild { color: #38a169; font-weight: 600; }
+
+    .imaging-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .imaging-card { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+    .imaging-card img { width: 100%; height: 220px; object-fit: cover; background: #1a202c; }
+    .imaging-placeholder { width: 100%; height: 220px; background: #1a202c; display: flex; align-items: center; justify-content: center; color: #718096; font-size: 13px; }
+    .imaging-info { padding: 12px; }
+    .imaging-info .modality { font-weight: 700; font-size: 15px; color: #1a56db; }
+    .imaging-info .date { font-size: 12px; color: #718096; margin-top: 2px; }
+    .imaging-info .error { font-size: 12px; color: #e53e3e; margin-top: 4px; }
+
+    .footer { text-align: center; padding: 20px; color: #a0aec0; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="width:56px;height:56px;flex-shrink:0;">
+    <circle cx="40" cy="40" r="38" fill="rgba(255,255,255,0.15)"/>
+    <rect x="33" y="16" width="14" height="48" rx="4" fill="white" opacity="0.95"/>
+    <rect x="16" y="33" width="48" height="14" rx="4" fill="white" opacity="0.95"/>
+    <rect x="16" y="33" width="48" height="2.5" rx="1" fill="#0e9f6e" opacity="0.8"/>
+    <rect x="16" y="38" width="48" height="2.5" rx="1" fill="#0e9f6e" opacity="0.6"/>
+    <rect x="16" y="43" width="48" height="2.5" rx="1" fill="#0e9f6e" opacity="0.4"/>
+    <path d="M16 24 L16 16 L24 16" stroke="#0e9f6e" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M64 24 L64 16 L56 16" stroke="#0e9f6e" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M16 56 L16 64 L24 64" stroke="#0e9f6e" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M64 56 L64 64 L56 64" stroke="#0e9f6e" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </svg>
+  <div>
+    <h1 style="font-size:26px;letter-spacing:3px;">DIPS</h1>
+    <p>DICOM International Patient Summary &nbsp;•&nbsp; {{ ips.patient.name }}</p>
+  </div>
+  <div class="badge">FHIR R5 • DICOMweb</div>
+</div>
+
+<div class="container">
+
+  <!-- Patient Demographics -->
+  <div class="patient-card">
+    <div class="patient-field">
+      <label>Full Name</label>
+      <p>{{ ips.patient.name }}</p>
+    </div>
+    <div class="patient-field">
+      <label>Date of Birth</label>
+      <p>{{ ips.patient.dob }}</p>
+    </div>
+    <div class="patient-field">
+      <label>Gender</label>
+      <p>{{ ips.patient.gender }}</p>
+    </div>
+    <div class="patient-field">
+      <label>Address</label>
+      <p>{{ ips.patient.address }}</p>
+    </div>
+    <div class="patient-field">
+      <label>Patient ID</label>
+      <p>{{ ips.patient.id }}</p>
+    </div>
+  </div>
+
+  <!-- Conditions -->
+  <div class="section">
+    <h2><span class="icon">🩺</span> Conditions</h2>
+    {% if ips.conditions %}
+    <table>
+      <tr><th>Condition</th><th>Severity</th><th>Body Site</th><th>Onset</th><th>Status</th></tr>
+      {% for c in ips.conditions %}
+      <tr>
+        <td>{{ c.get('code', {}).get('text', 'Unknown') }}</td>
+        <td class="severity-{{ c.get('severity', {}).get('coding', [{}])[0].get('display', '').lower() }}">
+          {{ c.get('severity', {}).get('coding', [{}])[0].get('display', 'N/A') }}
+        </td>
+        <td>{{ c.get('bodySite', [{}])[0].get('text', 'N/A') }}</td>
+        <td>{{ c.get('onsetDateTime', 'N/A') }}</td>
+        <td>{{ c.get('clinicalStatus', {}).get('coding', [{}])[0].get('code', 'N/A') }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p class="empty">No conditions recorded</p>
+    {% endif %}
+  </div>
+
+  <!-- Allergies -->
+  <div class="section">
+    <h2><span class="icon">⚠️</span> Allergies</h2>
+    {% if ips.allergies %}
+    <table>
+      <tr><th>Substance</th><th>Reaction</th><th>Severity</th><th>Status</th></tr>
+      {% for a in ips.allergies %}
+      <tr>
+        <td>{{ a.get('code', {}).get('text', 'Unknown') }}</td>
+        <td>{{ a.get('reaction', [{}])[0].get('manifestation', [{}])[0].get('concept', {}).get('text', 'N/A') }}</td>
+        <td>{{ a.get('reaction', [{}])[0].get('severity', 'N/A') }}</td>
+        <td>{{ a.get('clinicalStatus', {}).get('coding', [{}])[0].get('code', 'N/A') }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p class="empty">No allergies recorded</p>
+    {% endif %}
+  </div>
+
+  <!-- Medications -->
+  <div class="section">
+    <h2><span class="icon">💊</span> Medications</h2>
+    {% if ips.medications %}
+    <table>
+      <tr><th>Medication</th><th>Status</th><th>Intent</th></tr>
+      {% for m in ips.medications %}
+      <tr>
+        <td>{{ m.get('medicationCodeableConcept', {}).get('text', 'Unknown') }}</td>
+        <td>{{ m.get('status', 'N/A') }}</td>
+        <td>{{ m.get('intent', 'N/A') }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p class="empty">No medications recorded</p>
+    {% endif %}
+  </div>
+
+  <!-- Diagnostic Reports -->
+  <div class="section">
+    <h2><span class="icon">📋</span> Diagnostic Reports</h2>
+    {% if ips.reports %}
+    <table>
+      <tr><th>Report</th><th>Date</th><th>Status</th><th>Conclusion</th></tr>
+      {% for r in ips.reports %}
+      <tr>
+        <td>{{ r.get('code', {}).get('text', 'Unknown') }}</td>
+        <td>{{ r.get('effectiveDateTime', 'N/A') }}</td>
+        <td>{{ r.get('status', 'N/A') }}</td>
+        <td>{{ r.get('conclusion', 'N/A') }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p class="empty">No diagnostic reports recorded</p>
+    {% endif %}
+  </div>
+
+  <!-- Medical Imaging -->
+  <div class="section">
+    <h2><span class="icon">🔬</span> Medical Imaging</h2>
+    {% if images %}
+    <div class="imaging-grid">
+      {% for img in images %}
+      <div class="imaging-card">
+        {% if img.data %}
+          <img src="data:image/jpeg;base64,{{ img.data }}" alt="{{ img.modality }} image"/>
+        {% else %}
+          <div class="imaging-placeholder">📷 Image Unavailable</div>
+        {% endif %}
+        <div class="imaging-info">
+          <div class="modality">{{ img.modality }}</div>
+          <div class="date">{{ img.study_date }}</div>
+          {% if img.error %}<div class="error">{{ img.error }}</div>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty">No imaging studies available</p>
+    {% endif %}
+  </div>
+
+</div>
+
+<div class="footer">
+  DIPS — DICOM International Patient Summary &nbsp;•&nbsp; SIIM Hackathon 2026 &nbsp;•&nbsp; FHIR R5 + DICOMweb
+</div>
+
+</body>
+</html>
